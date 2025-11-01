@@ -12,21 +12,7 @@ namespace SMTP
         {
             InitializeComponent();
         }
-        private async Task<string> GetGmailAccessTokenAsync()
-        {
-            var secrets = new ClientSecrets
-            {
-                ClientId = "922881864955-3p6490andlfbr2f0rgs3q1s4s57n06p4.apps.googleusercontent.com",
-                ClientSecret = "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"
-            };
-            var scopes = new[] { "https://mail.google.com/" };
-            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                secrets,
-                scopes,
-                "user",
-                CancellationToken.None);
-            return await credential.GetAccessTokenForRequestAsync();
-        }
+       
         private async void Send_Click(object sender, EventArgs e)
         {
             try
@@ -58,7 +44,7 @@ namespace SMTP
                 message.Body = body;
                 message.ReplyTo.Add(new MailboxAddress("Support", "xotaoshi@gmail.com"));
 
-                string accessToken = await GetGmailAccessTokenAsync();
+                //string accessToken = await GetGmailAccessTokenAsync();
                 // Відправка листа через SMTP
                 using (var client = new MailKit.Net.Smtp.SmtpClient())
                 {
