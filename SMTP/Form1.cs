@@ -1,8 +1,8 @@
 ﻿using Google.Apis.Auth.OAuth2;
+using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
-using System.Net.Mail;
-using System.Windows.Forms;
+
 
 namespace SMTP
 {
@@ -12,13 +12,27 @@ namespace SMTP
         {
             InitializeComponent();
         }
-       
+        private async Task<string> GetGmailAccessTokenAsync()
+        {
+            var secrets = new ClientSecrets
+            {
+                ClientId = "922881864955-3p6490andlfbr2f0rgs3q1s4s57n06p4.apps.googleusercontent.com",
+                ClientSecret = "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"
+            };
+            var scopes = new[] { "https://mail.google.com/" };
+            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                secrets,
+                scopes,
+                "user",
+                CancellationToken.None);
+            return await credential.GetAccessTokenForRequestAsync();
+        }
         private async void Send_Click(object sender, EventArgs e)
         {
             try
             {
                 var message = new MimeMessage();
-                message.From.Add(new MailboxAddress(textFrom.Text, textFrom.Text)); //1 param name,  2 email 
+                message.From.Add(new MailboxAddress("Olga", textFrom.Text)); //1 param name,  2 email 
                 message.To.Add(new MailboxAddress(textTo.Text, textTo.Text));
                 message.Subject = text_theme.Text;
 
@@ -42,9 +56,9 @@ namespace SMTP
                     body.Add(attachment);
                 }
                 message.Body = body;
-                message.ReplyTo.Add(new MailboxAddress("Support", "xotaoshi@gmail.com"));
+                message.ReplyTo.Add(new MailboxAddress("Support", textFrom.Text));
 
-                //string accessToken = await GetGmailAccessTokenAsync();
+                string accessToken = await GetGmailAccessTokenAsync();
                 // Відправка листа через SMTP
                 using (var client = new MailKit.Net.Smtp.SmtpClient())
                 {
